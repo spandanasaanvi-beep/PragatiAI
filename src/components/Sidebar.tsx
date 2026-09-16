@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Route, Globe, Upload, Sparkles, ClipboardCheck,
-  FileBarChart, Award, Info, Mail, Menu, X, LogOut, Pencil, ShieldCheck,
+  FileBarChart, Award, Info, Mail, Menu, X, LogOut, Pencil,
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import ProfileEditModal from './ProfileEditModal';
@@ -18,10 +18,6 @@ const LEARNER_NAV_ITEMS = [
   { to: '/certificate', label: 'Certificate', icon: Award },
 ];
 
-const ADMIN_NAV_ITEMS = [
-  { to: '/admin', label: 'Admin Dashboard', icon: ShieldCheck },
-];
-
 const EXTRA_NAV_ITEMS = [
   { to: '/about', label: 'About Us', icon: Info },
   { to: '/contact', label: 'Contact Team', icon: Mail },
@@ -33,10 +29,7 @@ const Sidebar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const user = state.user;
-  const accountType = user?.accountType || 'Learner';
-  const visibleNavItems = accountType === 'Administrator' ? ADMIN_NAV_ITEMS : LEARNER_NAV_ITEMS;
-  const navItems = [...visibleNavItems, ...EXTRA_NAV_ITEMS];
-
+  const navItems = [...LEARNER_NAV_ITEMS, ...EXTRA_NAV_ITEMS];
   const isActive = (to: string) => location.pathname === to;
 
   const content = (
