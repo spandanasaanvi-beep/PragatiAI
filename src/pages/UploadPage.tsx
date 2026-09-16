@@ -8,7 +8,7 @@ import { EmptyState, SectionTitle } from '../components/EmptyState';
 import { UploadedMaterial } from '../types';
 
 const ACCEPTED = ['.pdf', '.docx', '.pptx', '.txt'];
-const MAX_SIZE_MB = 25;
+const MAX_SIZE_MB = 50;
 
 const PROCESS_STEPS = [
   'Material uploaded',
@@ -32,7 +32,7 @@ const UploadPage: React.FC = () => {
   const validate = (file: File): string | null => {
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!ACCEPTED.includes(ext)) return `Unable to process this file. Please upload PDF, DOCX, PPTX or TXT.`;
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) return `File exceeds the ${MAX_SIZE_MB} MB limit.`;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) return 'File size must not exceed 50 MB.';
     return null;
   };
 
