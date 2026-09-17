@@ -6,6 +6,21 @@ import { useAppContext } from '../context/AppContext';
 import { SectionTitle } from '../components/EmptyState';
 import { useToast } from '../components/Toast';
 
+const ACET_LOGO_PATH = '/logos/acet-logo.png';
+const PRAGATI_AI_LOGO_PATH = '/logos/pragati-ai-logo.png';
+
+const loadImageData = async (path: string): Promise<string> => {
+  const response = await fetch(path);
+  const blob = await response.blob();
+
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
 const CertificatePage: React.FC = () => {
   const navigate = useNavigate();
   const { state, isReady, roleReadiness } = useAppContext();
@@ -15,8 +30,12 @@ const CertificatePage: React.FC = () => {
   const cert = state.certificate;
 
   /* ------------------------- PDF generation ------------------------- */
-  const downloadCertificate = () => {
+  const downloadCertificate = async () => {
     if (!isReady || !user || !cert) return;
+    const [acetLogo, pragatiAiLogo] = await Promise.all([
+      loadImageData(ACET_LOGO_PATH),
+      loadImageData(PRAGATI_AI_LOGO_PATH),
+    ]);
     const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const W = 297, H = 210;
 
@@ -32,6 +51,10 @@ const CertificatePage: React.FC = () => {
     // Tricolor accent
     doc.setFillColor(255, 153, 51); doc.rect(8, 8, W - 16, 2.2, 'F');
     doc.setFillColor(19, 136, 8); doc.rect(8, H - 10.2, W - 16, 2.2, 'F');
+
+    // Certificate logos
+    doc.addImage(acetLogo, 'PNG', 18, 14, 24, 23.4);
+    doc.addImage(pragatiAiLogo, 'PNG', W - 40, 14, 22, 19.2);
 
     // Header
     doc.setTextColor(23, 52, 150);
@@ -126,7 +149,12 @@ const CertificatePage: React.FC = () => {
             <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <span className="text-5xl font-extrabold text-slate-200/70 -rotate-12 select-none">SAMPLE CERTIFICATE</span>
             </span>
-            <div className="text-center relative">
+            <div className="relative">
+              <div className="flex items-start justify-between">
+                <img src={ACET_LOGO_PATH} alt="ACET logo" className="h-16 w-auto object-contain" />
+                <img src={PRAGATI_AI_LOGO_PATH} alt="PragatiAI logo" className="h-16 w-auto object-contain" />
+              </div>
+              <div className="text-center">
               <p className="text-xs font-bold text-primary-800 tracking-widest">PRAGATIAI</p>
               <h3 className="text-xl font-serif font-bold text-slate-800 mt-4">Certificate of Completion &amp; Appreciation</h3>
               <p className="text-xs text-slate-500 mt-3">This is to certify that</p>
@@ -137,6 +165,7 @@ const CertificatePage: React.FC = () => {
               <div className="flex justify-between mt-10 text-[10px] text-slate-400">
                 <span>Certificate ID: PRG-XXXX-XXXXXX</span>
                 <span>Date: ____________</span>
+              </div>
               </div>
             </div>
           </div>
@@ -176,11 +205,17 @@ const CertificatePage: React.FC = () => {
 
       {/* The certificate */}
       <div id="certificate-print" className="certificate-border bg-white p-8 sm:p-12">
-        <div className="text-center">
-          <p className="text-sm font-extrabold text-primary-800 tracking-[0.3em]">PRAGATIAI</p>
-          <p className="text-[10px] text-slate-500 mt-0.5">Personalized Competency &amp; Learning Platform for iGOT Karmayogi</p>
+        <div className="relative">
+          <div className="flex items-start justify-between">
+            <img src={ACET_LOGO_PATH} alt="ACET logo" className="h-20 w-auto object-contain" />
+            <img src={PRAGATI_AI_LOGO_PATH} alt="PragatiAI logo" className="h-20 w-auto object-contain" />
+          </div>
 
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-6">Certificate of Completion &amp; Appreciation</h2>
+          <div className="text-center">
+            <p className="text-sm font-extrabold text-primary-800 tracking-[0.3em]">PRAGATIAI</p>
+            <p className="text-[10px] text-slate-500 mt-0.5">Personalized Competency &amp; Learning Platform for iGOT Karmayogi</p>
+
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-slate-900 mt-6">Certificate of Completion &amp; Appreciation</h2>
 
           <p className="text-xs text-slate-500 mt-6">This is to certify that</p>
           <p className="text-3xl font-serif font-bold text-primary-800 mt-2">{user?.fullName}</p>
@@ -196,18 +231,19 @@ const CertificatePage: React.FC = () => {
             <span className="font-semibold text-slate-700">Role Readiness: <span className="text-emerald-700">{roleReadiness}%</span></span>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-12 text-xs text-slate-500">
-            <div className="text-center sm:text-left">
-              <p className="border-t border-slate-300 pt-1.5 w-44">Completion Date</p>
-              <p className="font-semibold text-slate-700 mt-1">{completionDate}</p>
-            </div>
-            <div className="text-center mt-6 sm:mt-0">
-              <p className="font-bold text-primary-800 tracking-widest">PRAGATIAI</p>
-              <p className="text-[10px]">Competency Development Platform</p>
-            </div>
-            <div className="text-center sm:text-right">
-              <p className="border-t border-slate-300 pt-1.5 w-44 sm:ml-auto">Certificate ID</p>
-              <p className="font-semibold text-slate-700 mt-1">{cert.certificateId}</p>
+            <div className="flex flex-col sm:flex-row justify-between items-center mt-12 text-xs text-slate-500">
+              <div className="text-center sm:text-left">
+                <p className="border-t border-slate-300 pt-1.5 w-44">Completion Date</p>
+                <p className="font-semibold text-slate-700 mt-1">{completionDate}</p>
+              </div>
+              <div className="text-center mt-6 sm:mt-0">
+                <p className="font-bold text-primary-800 tracking-widest">PRAGATIAI</p>
+                <p className="text-[10px]">Competency Development Platform</p>
+              </div>
+              <div className="text-center sm:text-right">
+                <p className="border-t border-slate-300 pt-1.5 w-44 sm:ml-auto">Certificate ID</p>
+                <p className="font-semibold text-slate-700 mt-1">{cert.certificateId}</p>
+              </div>
             </div>
           </div>
         </div>
